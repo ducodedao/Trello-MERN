@@ -45,7 +45,20 @@ body {
 
     .btn:focus,
     .btn:active {
-        outline: none;
-        box-shadow: none;
+        outline: none !important;
+        box-shadow: none !important;
+    }
+
+    .editable {
+        background-color: inherit;
+        border: none;
+        font-size: inherit;
+        font-weight: inherit;
+        cursor: pointer;
+
+        &:focus {
+            background-color: #ffffff;
+            border: 1px solid $board-bg-color;
+        }
     }
 }
