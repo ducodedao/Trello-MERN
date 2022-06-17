@@ -3,10 +3,8 @@
 .column {
     flex: 0 0 auto;
     width: 300px;
-    height: calc(100% - 10px);
-    &:not(:first-child) {
-        margin-left: 10px;
-    }
+    height: $column-height;
+    margin-left: 10px;
 
     > * {
         background-color: $list-bg-color;
@@ -14,7 +12,7 @@
         padding: 0 8px;
     }
 
-    header {
+    header.column-drag-handle {
         padding-left: 15px;
         height: $column-header-height;
         line-height: $column-header-height;
@@ -22,6 +20,7 @@
         font-weight: bold;
         border-top-left-radius: 5px;
         border-top-right-radius: 5px;
+        cursor: pointer;
     }
 
     footer {
@@ -38,9 +37,10 @@
         list-style-type: none;
         margin: 0;
         max-height: calc(
-            100% - #{$column-header-height} - #{$column-footer-height}
+            #{$column-height} - #{$column-header-height} - #{$column-footer-height}
         );
         overflow-y: auto;
+
         &::-webkit-scrollbar {
             -webkit-appearance: none;
         }
@@ -50,6 +50,22 @@
         &::-webkit-scrollbar-thumb {
             background-color: darken($list-bg-color, 15);
             border-right: 5px solid $list-bg-color;
+        }
+
+        .card-ghost {
+            transition: transform 0.18s ease;
+            transform: rotateZ(5deg);
+        }
+
+        .card-ghost-drop {
+            transition: transform 0.18s ease-in-out;
+            transform: rotateZ(0deg);
+        }
+
+        .card-drop-preview {
+            background-color: rgba(150, 150, 200, 0.1);
+            border: 1px dashed #abc;
+            margin: 5px;
         }
     }
 }

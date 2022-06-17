@@ -2,19 +2,39 @@ import React from 'react'
 import './Column.scss'
 import Card from '../Card/Card'
 import { mapOrder } from '../../utils/mapOrder'
+import { Container, Draggable } from 'react-smooth-dnd'
 
 const Column = (props) => {
     const { column } = props
     const cards = mapOrder(column.cards, column.cardOrder, 'id')
 
+    const onCardDrop = () => {}
+
     return (
         <div className='column'>
-            <header>{column.title}</header>
-            <ul className='card-list'>
-                {cards.map((card, index) => (
-                    <Card key={index} card={card} />
-                ))}
-            </ul>
+            <header className='column-drag-handle'>{column.title}</header>
+            <div className='card-list'>
+                <Container
+                    groupName='col'
+                    orientation='vertical'
+                    onDrop={onCardDrop}
+                    getChildPayload={(index) => cards[index]}
+                    dragClass='card-ghost'
+                    dropClass='card-ghost-drop'
+                    dropPlaceholder={{
+                        animationDuration: 150,
+                        showOnTop: true,
+                        className: 'card-drop-preview',
+                    }}
+                    dropPlaceholderAnimationDuration={200}
+                >
+                    {cards.map((card, index) => (
+                        <Draggable key={index}>
+                            <Card card={card} />
+                        </Draggable>
+                    ))}
+                </Container>
+            </div>
             <footer>Add another card</footer>
         </div>
     )

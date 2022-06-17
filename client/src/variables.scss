@@ -4,3 +4,8 @@ $list-bg-color: #ebecf0;
 
 $column-header-height: 46px;
 $column-footer-height: 46px;
+
+$navbar-app-height: 5vh;
+$navbar-board-height: 6vh;
+$board-content-height: 88vh;
+$column-height: calc(#{$board-content-height} - (10px * 2));
