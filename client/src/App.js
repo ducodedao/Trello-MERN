@@ -1,10 +1,15 @@
 import React from 'react'
-import './App.css'
+import './App.scss'
+import AppBar from './components/AppBar/AppBar'
+import BoardBar from './components/BoardBar/BoardBar'
+import BoardContent from './components/BoardContent/BoardContent'
 
 const App = () => {
     return (
         <div className='App'>
-            <h1>Hello world with React and ducodedao!</h1>
+            <AppBar />
+            <BoardBar />
+            <BoardContent />
         </div>
     )
 }
