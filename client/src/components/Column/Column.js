@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import './Column.scss'
 import Card from '../Card/Card'
 import { mapOrder } from '../../utils/mapOrder'
@@ -6,11 +6,12 @@ import { Container, Draggable } from 'react-smooth-dnd'
 import { Dropdown } from 'react-bootstrap'
 import ConfirmModal from '../../common/ConfirmModal'
 import { MODAL_ACTION_CONFIRM } from '../../utils/constants'
-import { Form } from 'react-bootstrap'
+import { Form, Button } from 'react-bootstrap'
 import {
     saveContentAfterPressEnter,
     selectAllInlineText,
 } from '../../utils/editable'
+import { cloneDeep } from 'lodash'
 
 const Column = (props) => {
     const { column, onCardDrop, onUpdateColumn } = props
@@ -20,13 +21,27 @@ const Column = (props) => {
     const toggleConfirmModal = () => setShowConfirmModal(!showConfirmModal)
 
     const [columnTitle, setColumnTitle] = useState('')
-    const handleColumnTitleChange = useCallback((e) =>
-        setColumnTitle(e.target.value, []),
-    )
+    const handleColumnTitleChange = (e) => setColumnTitle(e.target.value, [])
+
+    const [openNewCardForm, setOpenNewCardForm] = useState(false)
+    const toggleOpenNewCardForm = () => setOpenNewCardForm(!openNewCardForm)
+
+    const newCardTextAreaRef = useRef(null)
+
+    const [newCardTitle, setNewCardTitle] = useState('')
+
+    const onNewCardTitleChange = (e) => setNewCardTitle(e.target.value)
 
     useEffect(() => {
         setColumnTitle(column.title)
     }, [column.title])
+
+    useEffect(() => {
+        if (newCardTextAreaRef && newCardTextAreaRef.current) {
+            newCardTextAreaRef.current.focus()
+            newCardTextAreaRef.current.select()
+        }
+    }, [openNewCardForm])
 
     const onConfirmModalAction = (type) => {
         if (type === MODAL_ACTION_CONFIRM) {
@@ -48,6 +63,29 @@ const Column = (props) => {
         }
 
         onUpdateColumn(newColumn)
+    }
+
+    const addNewCard = () => {
+        if (!newCardTitle) {
+            newCardTextAreaRef.current.focus()
+            return
+        }
+
+        const newCardToAt = {
+            id: Math.random().toString(36).substr(2, 5),
+            boardId: column.boardId,
+            columnId: column.id,
+            title: newCardTitle.trim(),
+            cover: null,
+        }
+
+        let newColumn = cloneDeep(column)
+        newColumn.cards.push(newCardToAt)
+        newColumn.cardOrder.push(newCardToAt.id)
+
+        onUpdateColumn(newColumn)
+        setNewCardTitle('')
+        toggleOpenNewCardForm()
     }
 
     return (
@@ -78,7 +116,9 @@ const Column = (props) => {
                             className='dropdown-btn'
                         />
                         <Dropdown.Menu>
-                            <Dropdown.Item>Add card</Dropdown.Item>
+                            <Dropdown.Item onClick={toggleOpenNewCardForm}>
+                                Add card
+                            </Dropdown.Item>
                             <Dropdown.Item onClick={toggleConfirmModal}>
                                 Remove column
                             </Dropdown.Item>
@@ -110,12 +150,52 @@ const Column = (props) => {
                         </Draggable>
                     ))}
                 </Container>
+
+                {openNewCardForm && (
+                    <div className='add-new-card'>
+                        <Form.Control
+                            size='sm'
+                            as='textarea'
+                            row='3'
+                            placeholder='Enter a title for this card'
+                            className='input-new-card'
+                            ref={newCardTextAreaRef}
+                            value={newCardTitle}
+                            onChange={onNewCardTitleChange}
+                            onKeyDown={(e) => e.key === 'Enter' && addNewCard()}
+                        />
+                    </div>
+                )}
             </div>
+
             <footer>
-                <div className='footer-actions'>
-                    <i className='fa fa-plus icon' />
-                    Add another card
-                </div>
+                {openNewCardForm && (
+                    <div>
+                        <Button
+                            variant='success'
+                            size='sm'
+                            onClick={addNewCard}
+                        >
+                            Add card
+                        </Button>
+                        <span
+                            className='cancel'
+                            onClick={toggleOpenNewCardForm}
+                        >
+                            <i className='fa fa-times icon'></i>
+                        </span>
+                    </div>
+                )}
+
+                {!openNewCardForm && (
+                    <div
+                        className='footer-actions'
+                        onClick={toggleOpenNewCardForm}
+                    >
+                        <i className='fa fa-plus icon' />
+                        Add another card
+                    </div>
+                )}
             </footer>
 
             <ConfirmModal

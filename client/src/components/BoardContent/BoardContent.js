@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import './BoardContent.scss'
 import Column from '../Column/Column'
 import { initData } from '../../actions/initData'
@@ -11,15 +11,16 @@ import { Form, Button, Col, Row } from 'react-bootstrap'
 const BoardContent = () => {
     const [board, setBoard] = useState({})
     const [columns, setColumns] = useState([])
-    const [openForm, setOpenForm] = useState(false)
+
+    const [openNewColumnForm, setOpenNewColumnForm] = useState(false)
+    const toggleOpenNewColumnForm = () =>
+        setOpenNewColumnForm(!openNewColumnForm)
+
     const [newColumnTitle, setNewColumnTitle] = useState('')
 
     const newColumnInputRef = useRef(null)
 
-    const onNewColumnTitleChange = useCallback(
-        (e) => setNewColumnTitle(e.target.value),
-        [],
-    )
+    const onNewColumnTitleChange = (e) => setNewColumnTitle(e.target.value)
 
     useEffect(() => {
         const boardFromDB = initData.boards.find(
@@ -40,7 +41,7 @@ const BoardContent = () => {
             newColumnInputRef.current.focus()
             newColumnInputRef.current.select()
         }
-    }, [openForm])
+    }, [openNewColumnForm])
 
     if (isEmpty(board)) {
         return <div className='not-found'>Board not found</div>
@@ -72,8 +73,6 @@ const BoardContent = () => {
         }
     }
 
-    const toggleForm = () => setOpenForm(!openForm)
-
     const addNewColumn = () => {
         if (!newColumnTitle) {
             newColumnInputRef.current.focus()
@@ -98,7 +97,7 @@ const BoardContent = () => {
         setColumns(newColumns)
         setBoard(newBoard)
         setNewColumnTitle('')
-        toggleForm()
+        toggleOpenNewColumnForm()
     }
 
     const onUpdateColumn = (newColumnToUpdate) => {
@@ -148,14 +147,17 @@ const BoardContent = () => {
                 ))}
             </Container>
 
-            {!openForm && (
-                <div className='add-new-column' onClick={toggleForm}>
+            {!openNewColumnForm && (
+                <div
+                    className='add-new-column'
+                    onClick={toggleOpenNewColumnForm}
+                >
                     <i className='fa fa-plus icon' />
                     Add new column
                 </div>
             )}
 
-            {openForm && (
+            {openNewColumnForm && (
                 <Row>
                     <Col className='enter-new-column'>
                         <Form.Control
@@ -177,7 +179,11 @@ const BoardContent = () => {
                         >
                             Add column
                         </Button>
-                        <span className='cancel' onClick={toggleForm}>
+
+                        <span
+                            className='cancel'
+                            onClick={toggleOpenNewColumnForm}
+                        >
                             <i className='fa fa-times icon'></i>
                         </span>
                     </Col>
